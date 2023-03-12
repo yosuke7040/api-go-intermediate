@@ -47,8 +47,8 @@ func ArticleListHandler(w http.ResponseWriter, req *http.Request) {
 
 	log.Println(page)
 
-	reqArticleList := []models.Article{models.Article1, models.Article2}
-	json.NewEncoder(w).Encode(reqArticleList)
+	articleList  := []models.Article{models.Article1, models.Article2}
+	json.NewEncoder(w).Encode(articleList )
 }
 
 // GET /article/{id} のハンドラ
