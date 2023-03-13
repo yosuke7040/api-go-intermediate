@@ -21,34 +21,22 @@ func main() {
 	}
 	defer db.Close()
 
-	articleID := 1
-	const sqlStr = `
-		select *
-		from articles
-		where article_id = ?;
-	`
-	row := db.QueryRow(sqlStr, articleID)
-	if err := row.Err(); err != nil {
-		fmt.Println(err)
-		return
+	article := models.Article {
+		Title: "insert test",
+		Contents: "Can I inset data correctly?",
+		UserName: "saki",
 	}
+	const sqlStr = `
+		insert into articles (title, contents, username, nice, created_at) values
+		(?, ?, ?, 0, now());
+	`
 
-	var article models.Article
-	var createdTime sql.NullTime
-	err = row.Scan(&article.ID,
-								 &article.Title,
-								 &article.Contents, 
-								 &article.UserName, 
-								 &article.NiceNum,
-								 &createdTime)
+	result, err := db.Exec(sqlStr, article.Title, article.Contents, article.UserName)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	if createdTime.Valid {
-		article.CreatedAt = createdTime.Time
-	}
-
-	fmt.Printf("%+v\n", article)
+	fmt.Println(result.LastInsertId())
+	fmt.Println(result.RowsAffected())
 }
