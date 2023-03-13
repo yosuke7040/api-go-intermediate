@@ -39,4 +39,41 @@ func main() {
 
 	fmt.Println(result.LastInsertId())
 	fmt.Println(result.RowsAffected())
+
+	tx, err := db.Begin()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	article_id := 1
+	const sqlGetNice = `
+		select nice
+		from articles
+		where article_id = ?;
+	`
+	row := tx.QueryRow(sqlGetNice, article_id)
+	if err := row.Err(); err != nil {
+		fmt.Println(err)
+		tx.Rollback()
+		return
+	}
+
+	var nicenum int
+	err = row.Scan(&nicenum)
+	if err != nil {
+		fmt.Println(err)
+		tx.Rollback()
+		return
+	}
+
+	const sqlUpdateNice = `update articles set nice = ? where article_id = ?`
+	_, err = tx.Exec(sqlUpdateNice, nicenum+1, article_id)
+	if err != nil {
+		fmt.Println(err)
+		tx.Rollback()
+		return
+	}
+
+	tx.Commit()
 }
