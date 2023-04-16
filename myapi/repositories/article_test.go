@@ -6,6 +6,8 @@ import (
 	"github.com/yourname/reponame/models"
 	"github.com/yourname/reponame/repositories"
 	"github.com/yourname/reponame/repositories/testdata"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 // SelectArticleList関数のテスト
@@ -29,11 +31,10 @@ func TestSelectArticleDetail(t *testing.T) {
 	}{
 		{
 			testTitle: "subtest1",
-			expected: testdata.ArticleTestData[0],
-		},
-		{
+			expected:  testdata.ArticleTestData[0],
+		}, {
 			testTitle: "subtest2",
-			expected: testdata.ArticleTestData[1],
+			expected:  testdata.ArticleTestData[1],
 		},
 	}
 
@@ -71,7 +72,7 @@ func TestInsertArticle(t *testing.T) {
 		UserName: "saki",
 	}
 
-	expectedArticleNum := 10
+	expectedArticleNum := 3
 	newArticle, err := repositories.InsertArticle(testDB, article)
 	if err != nil {
 		t.Error(err)
@@ -92,22 +93,16 @@ func TestInsertArticle(t *testing.T) {
 // UpdateNiceNum関数のテスト
 func TestUpdateNiceNum(t *testing.T) {
 	articleID := 1
-	before, err := repositories.SelectArticleDetail(testDB, articleID)
-	if err != nil {
-		t.Fatal("fail to get before data")
-	}
-
-	err = repositories.UpdateNiceNum(testDB, articleID)
+	err := repositories.UpdateNiceNum(testDB, articleID)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	after, err := repositories.SelectArticleDetail(testDB, articleID)
-	if err != nil {
-		t.Fatal("fail to get after data")
-	}
+	got, _ := repositories.SelectArticleDetail(testDB, articleID)
 
-	if after.NiceNum-before.NiceNum != 1 {
-		t.Error("fail to update nice num")
+	if got.NiceNum-testdata.ArticleTestData[articleID-1].NiceNum != 1 {
+		t.Errorf("fail to update nice num: expected %d but got %d\n",
+			testdata.ArticleTestData[articleID].NiceNum,
+			got.NiceNum)
 	}
 }

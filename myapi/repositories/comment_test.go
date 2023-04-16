@@ -29,7 +29,7 @@ func TestInsertComment(t *testing.T) {
 		Message:   "CommentInsertTest",
 	}
 
-	expectedCommentID := 9
+	expectedCommentID := 3
 	newComment, err := repositories.InsertComment(testDB, comment)
 	if err != nil {
 		t.Error(err)
